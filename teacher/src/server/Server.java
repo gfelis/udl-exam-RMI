@@ -1,12 +1,11 @@
 package server;
 
-import common.ServerInterface;
+
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Scanner;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+
 
 public class Server {
 
@@ -30,20 +29,21 @@ public class Server {
     }
 
     public static void main(String args[]) {
-        BlockingQueue<String> input = new LinkedBlockingQueue<>();
-        InputHandler background = new InputHandler(input);
+        InputHandler background = new InputHandler();
         background.start();
-        try {
 
+        try {
             Registry registry = startRegistry(null);
-            TeacherImplementation obj = new TeacherImplementation();
-            registry.bind("Exam", obj);
+            TeacherImplementation teacher = new TeacherImplementation();
+            registry.bind("Exam", teacher);
             System.out.println("Room ready.");
-            while (input.isEmpty() || !input.take().equals("start")) {
+            while (!background.start) {
                 System.out.println("Waiting for more students to register...");
-                Thread.sleep(10000);
+                synchronized (Server.class){
+                    Server.class.wait();
+                }
             }
-            obj.start_exam();
+            teacher.start_exam();
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString()); e.printStackTrace();
         }
@@ -52,22 +52,23 @@ public class Server {
 
 class InputHandler {
 
-    private final BlockingQueue<String> in;
+    public boolean start;
 
 
-    public InputHandler(BlockingQueue<String> input) {
-        in = input;
+    public InputHandler() {
+        this.start = false;
     }
 
     public void start() {
         new Thread(() -> {
             while (true) {
-                try {
-                    Scanner input = new Scanner(System.in);
-                    String command = input.nextLine();
-                    in.put(command);
-                } catch (InterruptedException ie) {
-                    ie.printStackTrace();
+                Scanner input = new Scanner(System.in);
+                String command = input.nextLine();
+                if(command.equals("start")){
+                    synchronized (Server.class) {
+                        start = true;
+                        Server.class.notify();
+                    }
                 }
             }
         }).start();

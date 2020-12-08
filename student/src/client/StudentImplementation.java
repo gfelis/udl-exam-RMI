@@ -13,12 +13,18 @@ public class StudentImplementation extends UnicastRemoteObject implements Client
     }
 
     @Override
-    public void notifyStart(){
-        System.out.print("Student received \"Exam started.\" message from server");
+    public void sendMessage(String message){
+        System.out.print(message);
     }
 
     @Override
     public String getId(){
         return this.id;
+    }
+
+    @Override
+    public void denyConnection(String error){
+        System.err.println("Connection denied. " + error);
+        System.exit(-1);
     }
 }
