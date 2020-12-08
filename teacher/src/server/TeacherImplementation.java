@@ -10,14 +10,15 @@ import java.util.ArrayList;
 public class TeacherImplementation extends UnicastRemoteObject implements ServerInterface {
     public TeacherImplementation() throws RemoteException {}
 
-    private ArrayList<ClientInterface> students = new ArrayList<>();
+    private final ArrayList<ClientInterface> students = new ArrayList<>();
 
-    public void register(ClientInterface student){
-        System.out.println("Registering student");
+    public synchronized void register(ClientInterface student) throws RemoteException{
+        System.out.println("Student with id: " + student.getId() + " has been registered.");
         this.students.add(student);
     }
 
-    public void notify_students(){
+    public void start_exam(){
+        System.out.println("Registering time is over, the exam is starting.");
         for (ClientInterface s: this.students){
             try{
                 System.out.println("Notifying the student");
