@@ -15,11 +15,16 @@ public class Client {
             Scanner studentInput = new Scanner(System.in);
             System.out.println("Introduce your ID:");
             String id = studentInput.nextLine();
-            StudentImplementation client = new StudentImplementation(id);
-            stub.register(client);
+            StudentImplementation student = new StudentImplementation(id);
+            stub.register(student);
+            synchronized (student){
+                student.wait();
+                while(studentInput.hasNext()) {
+                    String answer = studentInput.nextLine();
+                    stub.receiveAnswer(student, answer);
+                }
 
-
-
+            }
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString()); e.printStackTrace();
         }
