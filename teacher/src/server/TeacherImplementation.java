@@ -24,11 +24,10 @@ public class TeacherImplementation extends UnicastRemoteObject implements Server
 
 
     @Override
-    public void register(ClientInterface student) throws RemoteException{
+    public void register(ClientInterface student, String id) throws RemoteException{
         synchronized (Server.class) {
             Server.class.notify();
         }
-        String id = student.getId();
         if(exam_on){
             student.denyConnection("Exam has already started.");
         }
@@ -47,7 +46,7 @@ public class TeacherImplementation extends UnicastRemoteObject implements Server
 
     @Override
     public void receiveAnswer(ClientInterface student, String answer) throws RemoteException{
-        String id = student.getId();
+        String id = ids.get(student);
         int guess = Integer.parseInt(answer);
         int question_index = progress.get(student);
         if(question_index == exam.questions.size()){

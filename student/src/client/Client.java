@@ -15,8 +15,8 @@ public class Client {
             Scanner studentInput = new Scanner(System.in);
             System.out.println("Introduce your ID:");
             String id = studentInput.nextLine();
-            StudentImplementation student = new StudentImplementation(id);
-            stub.register(student);
+            StudentImplementation student = new StudentImplementation();
+            stub.register(student, id);
             synchronized (student){
                 student.wait();
                 while(studentInput.hasNext()) {
