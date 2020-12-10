@@ -50,12 +50,12 @@ public class TeacherImplementation extends UnicastRemoteObject implements Server
         String id = student.getId();
         int guess = Integer.parseInt(answer);
         int question_index = progress.get(student);
-        if(guess < 0 || guess > exam.choices.get(question_index).size()){
-            student.sendMessage("Please enter a valid number.");
+        if(question_index == exam.questions.size()){
+            give_mark(student);
         }else{
-            if(progress.get(student) == exam.questions.size()){
-                give_mark(student);
-            }else{
+            if(guess < 0 || guess > exam.choices.get(question_index).size()) {
+                student.sendMessage("Please enter a valid number.");
+            } else{
                 if(exam.answers.get(question_index) == guess){
                     marks.put(student, marks.get(student) + 1);
                 }
@@ -64,6 +64,7 @@ public class TeacherImplementation extends UnicastRemoteObject implements Server
             }
         }
     }
+
 
     public void sendQuestion(ClientInterface student) throws RemoteException{
         Integer question_index = progress.get(student);
