@@ -14,7 +14,7 @@ public class StudentImplementation extends UnicastRemoteObject implements Client
 
     @Override
     public void sendMessage(String message){
-        System.out.println("Client received: \"" + message + "\" from server.");
+        System.out.println("Server: \"" + message + "\"");
     }
 
     @Override

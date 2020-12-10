@@ -45,24 +45,29 @@ public class TeacherImplementation extends UnicastRemoteObject implements Server
     public void receiveAnswer(ClientInterface student, String answer) throws RemoteException{
         String id = student.getId();
         int guess = Integer.parseInt(answer);
-        if(progress.get(student) == exam.questions.size()){
-            give_mark(student);
+        int question_index = progress.get(student);
+        if(guess < 0 || guess > exam.choices.get(question_index).size()){
+            student.sendMessage("Please enter a valid number.");
         }else{
-            int question_index = progress.get(student);
-            if(exam.answers.get(question_index) == guess){
-                marks.put(student, marks.get(student) + 1);
+            if(progress.get(student) == exam.questions.size()){
+                give_mark(student);
+            }else{
+                if(exam.answers.get(question_index) == guess){
+                    marks.put(student, marks.get(student) + 1);
+                }
+                System.out.println("Student " + id + " answered with " + answer);
+                sendQuestion(student);
             }
-            System.out.println("Student " + id + " answered with " + answer);
-            sendQuestion(student);
         }
     }
 
     public void sendQuestion(ClientInterface student) throws RemoteException{
         Integer question_index = progress.get(student);
-        student.sendMessage(exam.questions.get(question_index));
         ArrayList<String> choices = exam.choices.get(question_index);
+        student.sendMessage("Enter a number from 1 to " + choices.size() + " to answer question nº " + (question_index + 1) + ".");
+        student.sendMessage(exam.questions.get(question_index));
         for (String choice : choices) {
-            student.sendMessage(choice);
+            student.sendMessage(choices.indexOf(choice) + 1 + "): " + choice);
         }
         progress.put(student, question_index + 1);
 
