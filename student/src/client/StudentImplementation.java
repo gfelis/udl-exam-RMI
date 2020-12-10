@@ -43,15 +43,4 @@ public class StudentImplementation extends UnicastRemoteObject implements Client
         System.exit(-1);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-
-        if (!(o instanceof StudentImplementation)) {
-            return false;
-        }
-        return ((StudentImplementation) o).id.equals(this.id);
-    }
 }

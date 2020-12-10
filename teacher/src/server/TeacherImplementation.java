@@ -7,16 +7,15 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class TeacherImplementation extends UnicastRemoteObject implements ServerInterface {
     public TeacherImplementation() throws RemoteException {}
 
+    final Set<String> ids = new HashSet<>();
     final Map<ClientInterface, Integer> marks = new HashMap<>();
-    final Exam exam = new Exam("/home/ceriol_06/IdeaProjects/udl-exam-RMI/test/exam2.csv");
+    final Exam exam = new Exam("/home/gfelis/udl-exam-RMI/test/exam2.csv");
     final Map<ClientInterface, Integer> progress = new HashMap<>();
     private boolean exam_on = false;
 
@@ -29,7 +28,8 @@ public class TeacherImplementation extends UnicastRemoteObject implements Server
         if(exam_on){
             student.denyConnection("Exam has already started.");
         }
-        if (!marks.containsKey(student)){
+        if (!ids.contains(id)){
+            this.ids.add(id);
             this.marks.put(student, 0);
             this.progress.put(student, 0);
             System.out.println("Student with id: " + id + " has been registered." + " There are " +
