@@ -12,7 +12,7 @@ import java.util.*;
 
 public class TeacherImplementation extends UnicastRemoteObject implements ServerInterface {
 
-    final Set<String> ids = new HashSet<>();
+    final Map<ClientInterface, String> ids = new HashMap<>();
     final Map<ClientInterface, Integer> marks = new HashMap<>();
     final Exam exam;
     final Map<ClientInterface, Integer> progress = new HashMap<>();
@@ -32,8 +32,8 @@ public class TeacherImplementation extends UnicastRemoteObject implements Server
         if(exam_on){
             student.denyConnection("Exam has already started.");
         }
-        if (!ids.contains(id)){
-            this.ids.add(id);
+        if (!ids.containsValue(id)){
+            this.ids.put(student, id);
             this.marks.put(student, 0);
             this.progress.put(student, 0);
             System.out.println("Student with id: " + id + " has been registered." + " There are " +
@@ -93,7 +93,7 @@ public class TeacherImplementation extends UnicastRemoteObject implements Server
             PrintWriter writer = new PrintWriter("results.txt", StandardCharsets.UTF_8);
             writer.println("<Student_id>: <mark>");
             for(ClientInterface s: marks.keySet()){
-                String id = s.getId();
+                String id = ids.get(s);
                 String line = id + ": " + marks.get(s);
                 writer.println(line);
             }
