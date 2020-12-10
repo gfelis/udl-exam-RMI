@@ -11,13 +11,17 @@ import java.util.*;
 
 
 public class TeacherImplementation extends UnicastRemoteObject implements ServerInterface {
-    public TeacherImplementation() throws RemoteException {}
 
     final Set<String> ids = new HashSet<>();
     final Map<ClientInterface, Integer> marks = new HashMap<>();
-    final Exam exam = new Exam("/home/gfelis/udl-exam-RMI/test/exam2.csv");
+    final Exam exam;
     final Map<ClientInterface, Integer> progress = new HashMap<>();
     private boolean exam_on = false;
+
+    public TeacherImplementation(String exam_path) throws RemoteException {
+        this.exam = new Exam(exam_path);
+    }
+
 
     @Override
     public void register(ClientInterface student) throws RemoteException{

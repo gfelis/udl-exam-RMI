@@ -32,10 +32,10 @@ public class Server {
     public static void main(String args[]) {
         InputHandler background = new InputHandler();
         background.start();
-
+        String path = "./test/exam1.csv";
         try {
             Registry registry = startRegistry(null);
-            TeacherImplementation teacher = new TeacherImplementation();
+            TeacherImplementation teacher = new TeacherImplementation(path);
             registry.bind("Exam", teacher);
             System.out.println("Room ready. Write \"start\" and hit enter to start the exam and \"finish\" to end it.");
             System.out.println("Waiting for more students to register...");
