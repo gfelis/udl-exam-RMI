@@ -42,4 +42,16 @@ public class StudentImplementation extends UnicastRemoteObject implements Client
         System.out.println("Your mark is: " + correct + " out of " + total +". Final mark = " + final_mark);
         System.exit(-1);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof StudentImplementation)) {
+            return false;
+        }
+        return ((StudentImplementation) o).id.equals(this.id);
+    }
 }

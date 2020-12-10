@@ -16,7 +16,7 @@ public class TeacherImplementation extends UnicastRemoteObject implements Server
     public TeacherImplementation() throws RemoteException {}
 
     final Map<ClientInterface, Integer> marks = new HashMap<>();
-    final Exam exam = new Exam("/home/gfelis/udl-exam-RMI/test/exam1.csv");
+    final Exam exam = new Exam("/home/ceriol_06/IdeaProjects/udl-exam-RMI/test/exam2.csv");
     final Map<ClientInterface, Integer> progress = new HashMap<>();
     private boolean exam_on = false;
 
