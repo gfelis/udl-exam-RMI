@@ -11,7 +11,6 @@ import java.util.Scanner;
 
 public class Server {
 
-
     private static Registry startRegistry(Integer port)
             throws RemoteException {
         if(port == null) {
@@ -72,36 +71,36 @@ public class Server {
             System.err.println("Server exception: " + e.toString()); e.printStackTrace();
         }
     }
-}
 
-class InputHandler {
+    private static class InputHandler {
 
-    public boolean start;
-    public boolean finish;
+        public boolean start;
+        public boolean finish;
 
-    public InputHandler() {
-        this.start = false;
-        this.finish = false;
-    }
+        public InputHandler() {
+            this.start = false;
+            this.finish = false;
+        }
 
-    public void start() {
-        new Thread(() -> {
-            while (true) {
-                Scanner input = new Scanner(System.in);
-                String command = input.nextLine();
-                if(command.equals("start")){
-                    synchronized (Server.class) {
-                        start = true;
-                        Server.class.notify();
+        public void start() {
+            new Thread(() -> {
+                while (true) {
+                    Scanner input = new Scanner(System.in);
+                    String command = input.nextLine();
+                    if(command.equals("start")){
+                        synchronized (Server.class) {
+                            start = true;
+                            Server.class.notify();
+                        }
+                    }
+                    if(command.equals("finish")){
+                        synchronized (Server.class) {
+                            if(start) finish = true;
+                            Server.class.notify();
+                        }
                     }
                 }
-                if(command.equals("finish")){
-                    synchronized (Server.class) {
-                        if(start) finish = true;
-                        Server.class.notify();
-                    }
-                }
-            }
-        }).start();
+            }).start();
+        }
     }
 }
