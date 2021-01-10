@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import okhttp3.*;
 
 
 public class TeacherImplementation extends UnicastRemoteObject implements ServerInterface {
@@ -20,26 +21,37 @@ public class TeacherImplementation extends UnicastRemoteObject implements Server
 
     public TeacherImplementation(String exam_path) throws RemoteException {
         this.exam = new Exam(exam_path);
+        String url_get = "http://127.0.0.1:8000/api/exams/?search=" + exam.name;
+        if(GET_empty_body(url_get)){
+            MediaType mediaType = MediaType.parse("application/json");
+            RequestBody body = RequestBody.create(mediaType, "{\n    \"title\": \""+ exam.name +"\",\n    \"description\": \""+ exam.description +"\",\n    \"date\": \""+exam.date+"\",\n    \"time_start\": \""+ exam.time_start+"\",\n    \"time_end\": \""+exam.time_finish+"\",\n    \"location\": \""+ exam.location +"\"\n}");
+            String url_post = "http://127.0.0.1:8000/api/exams/";
+            sendPOST(body, url_post);
+        }
     }
 
 
     @Override
-    public void register(ClientInterface student, String id) throws RemoteException{
+    public void register(ClientInterface student, String id, String name) throws RemoteException{
         synchronized (Server.class) {
             Server.class.notify();
         }
+        String url = "http://127.0.0.1:8000/api/students/" + id;
         if(exam_on){
             student.denyConnection("Exam has already started.");
+        }
+        if(GET_empty_body(url)){
+            student.denyConnection("You are not registered on the WS.");
         }
         if (!ids.containsValue(id)){
             this.ids.put(student, id);
             this.marks.put(student, 0);
             this.progress.put(student, 0);
             System.out.println("Student with id: " + id + " has been registered." + " There are " +
-                    marks.size() + " students in the room.");
+                        marks.size() + " students in the room.");
             student.sendMessage("You have correctly registered. Wait for the exam to start.");
         }else{
-            System.err.println("Denying connection to student with id " + id + ".");
+            System.err.println("Denying connection to student with id " + id + "");
             student.denyConnection("A student with this id has already been registered.");
         }
     }
@@ -68,7 +80,7 @@ public class TeacherImplementation extends UnicastRemoteObject implements Server
     public void sendQuestion(ClientInterface student) throws RemoteException{
         Integer question_index = progress.get(student);
         ArrayList<String> choices = exam.choices.get(question_index);
-        student.sendMessage("Enter a number from 1 to " + choices.size() + " to answer question nº " + (question_index + 1) + ".");
+        student.sendMessage("Enter a number from 1 to " + choices.size() + " to answer question nº " + (question_index + 1) + "");
         student.sendMessage(exam.questions.get(question_index));
         for (String choice : choices) {
             student.sendMessage(choices.indexOf(choice) + 1 + "): " + choice);
@@ -121,5 +133,52 @@ public class TeacherImplementation extends UnicastRemoteObject implements Server
     public void start_exam(){
         System.out.println("The exam has started, students are being notified.");
         exam_on = true;
+    }
+
+    private void sendPOST(RequestBody body, String url){
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .method("POST", body)
+                .addHeader("Content-Type", "application/json")
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            if(response.code() == 201){
+                System.out.println("POST completed successfully.");
+            }else{
+                System.out.println("POST didn't work.");
+                System.out.println(response.code());
+            }
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean GET_empty_body(String url){
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .method("GET", null)
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
+            String response_body = response.body().string();
+            System.out.println(response_body);
+            if(response_body.equals("[]")){
+                System.out.println("GET had empty body.");
+                return true;
+            }else{
+                System.out.println("GET didn't have empty body.");
+                System.out.println(response.code());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
