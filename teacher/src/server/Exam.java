@@ -6,7 +6,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Exam {
-
+    String name;
+    String description;
+    String date;
+    String time_start;
+    String time_finish;
+    String location;
     ArrayList<String> questions = new ArrayList<>();
     ArrayList<ArrayList<String>> choices = new ArrayList<>();
     ArrayList<Integer> answers = new ArrayList<>();
@@ -18,6 +23,14 @@ public class Exam {
     private void read_csv(String filepath){
         try {
             BufferedReader csvReader = new BufferedReader(new FileReader(filepath));
+            String params = csvReader.readLine();
+            String[] exam_info = params.split(";");
+            name = exam_info[0];
+            description = exam_info[1];
+            date = exam_info[2];
+            time_start = exam_info[3];
+            time_finish = exam_info[4];
+            location = exam_info[5];
             String row = csvReader.readLine();
             while (row != null) {
                 String[] data = row.split(";");

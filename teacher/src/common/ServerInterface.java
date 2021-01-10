@@ -3,6 +3,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface ServerInterface extends Remote{
-    void register(ClientInterface client, String id) throws RemoteException;
+    void register(ClientInterface client, String id, String na) throws RemoteException;
     void receiveAnswer(ClientInterface client, String answer) throws RemoteException;
 }

@@ -15,8 +15,10 @@ public class Client {
             Scanner studentInput = new Scanner(System.in);
             System.out.println("Introduce your ID:");
             String id = studentInput.nextLine();
+            System.out.println("Introduce your name:");
+            String name = studentInput.nextLine();
             StudentImplementation student = new StudentImplementation();
-            stub.register(student, id);
+            stub.register(student, id, name);
             synchronized (student){
                 student.wait();
                 while(studentInput.hasNext()) {
